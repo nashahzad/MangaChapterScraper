@@ -1,0 +1,51 @@
+{% extends "bootstrap/base.html" %}
+{% block title %}This is an example page{% endblock %}
+
+{% block styles %}
+{{super()}}
+<link rel="stylesheet"
+      href="{{url_for('.static', filename='styles.css')}}">
+{% endblock %}
+
+{% block navbar %}
+<div class="navbar">
+    <!-- ... -->
+</div>
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+    <div class="row">
+        <nav class="navbar navbar-dark bg-dark">
+  <a class="navbar-dark bg-dark">
+    <img src="https://cdn.hashnode.com/res/hashnode/image/upload/v1518503935975/S1_-_WePM.png" width="30" height="30" class="d-inline-block align-top" alt="">
+    MangaChapterScraper
+  </a>
+</nav>
+    </div>
+
+        <div class="row center_div">
+    <form action="/search">
+  <div class="form-group row">
+    <label for="inputEmail3" class="col-sm-2 col-form-label">Chapter first page</label>
+    <div class="col-sm-10">
+      <input type="text" name="website" class="form-control" id="inputEmail3" >
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="inputEmail3" class="col-sm-2 col-form-label">Chapter Number</label>
+    <div class="col-sm-10">
+      <input type="text" name="chapter" class="form-control" id="inputEmail3" >
+    </div>
+  </div>
+  <div class="form-group row">
+    <div class="col-sm-10 text-center">
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+  </div>
+</form>
+        </div>
+    </div>
+
+{% endblock %}
+

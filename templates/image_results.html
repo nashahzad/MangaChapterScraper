@@ -1,0 +1,20 @@
+{% extends "bootstrap/base.html" %}
+{% block title %}This is an example page{% endblock %}
+
+{% block navbar %}
+<div class="navbar navbar-fixed-top">
+  <!-- ... -->
+</div>
+{% endblock %}
+
+{% block body%}
+    <div class="container">
+    {% for image in images %}
+        <div class="row">
+    <img src={{ image }}>
+        </div>
+    {% endfor %}
+    </div>
+{% endblock %}
+
+
