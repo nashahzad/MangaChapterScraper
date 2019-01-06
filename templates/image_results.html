@@ -1,5 +1,20 @@
 {% extends "bootstrap/base.html" %}
-{% block title %}This is an example page{% endblock %}
+{% block title %}Manga Chapter{% endblock %}
+
+{% block styles %}
+{{super()}}
+    {% if light %}
+    {% block if %}
+<link rel="stylesheet"
+      href="{{url_for('.static', filename='styles.css')}}">
+        {% endblock if %}
+    {% else %}
+    {% block else %}
+<link rel="stylesheet"
+      href="{{url_for('.static', filename='dark_styles.css')}}">
+        {% endblock else %}
+    {% endif %}
+{% endblock %}
 
 {% block navbar %}
 <div class="navbar navbar-fixed-top">
