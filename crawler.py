@@ -11,19 +11,27 @@ class ImageCrawler:
         self.website = website
         self.chapter = args['chapter']
         extract = tldextract.extract(website)
-        self.manga = extract.domain
+        self.manga = extract.registered_domain
         self.visited = {}
 
-    def nextMangaURL(self, soup, manga, chapter, page):
-        urls = soup.findAll('a', href=True)
-        for url in urls:
-            link = url['href'] if 'http' in url['href'] else 'http:' + url['href']
-            if link not in self.visited and manga in link and chapter in link and str(page) in link:
-                return url['href'] if 'http' in url['href'] else 'http:' + url['href']
-        return None
+    def validateURL(self, website):
+        if self.manga not in website:
+            website = 'https://' + self.manga + website
+        elif 'http' not in website:
+            website = 'https:' + website
+        return website
 
-    def imageDimensions(self, image):
-        url = image['src']
+    def nextMangaURL(self, image, manga, chapter, page):
+        parent = image.parent
+        if parent.get('href', None) is None:
+            return None
+        website = parent['href']
+        website = self.validateURL(website)
+        if manga not in website or chapter not in website or str(page) not in website:
+            return None
+        return website
+
+    def imageDimensions(self, url):
         if 'png' not in url and 'jpeg' not in url:
             return sys.maxsize
         url = url if 'http' in url else 'http:' + url
@@ -35,7 +43,7 @@ class ImageCrawler:
         images = soup.findAll('img')
         images = sorted(images, key=lambda x: self.imageDimensions(x), reverse=True)
         if images:
-            return images[0]['src']
+            return images[0]
         else:
             return None
 
@@ -50,8 +58,8 @@ class ImageCrawler:
             image = self.getBiggestImage(soup)
             if not image:
                 break
-            images_list.append(image)
-            website = self.nextMangaURL(soup, self.manga, self.chapter, page)
+            images_list.append(image['src'])
+            website = self.nextMangaURL(image, self.manga, self.chapter, page)
             if not website:
                 break
         return images_list

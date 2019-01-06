@@ -6,10 +6,9 @@ Given a starting url for first page a of a manga chapter and the chapter number,
 docker build -t MangaChapterScraper .
 docker run -d -p 5000:80 MangaChapterScraper
 ```
-- Currently tested on mangatown and mangastream(still WIP for mangastream)
+- Currently tested on mangatown and mangastream
 
 
-### Future Updates
+### Future Updates/Ideas
 
-- Extend functionality/logic to work on other manga sites
-    - Look into how to generically parse for url of next page
+- Add in feature to start another crawl on next chapter 
