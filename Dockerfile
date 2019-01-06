@@ -1,4 +1,7 @@
-FROM python:3.5.6
+FROM python:3.6-alpine
+
+RUN apk add build-base python-dev py-pip jpeg-dev zlib-dev
+ENV LIBRARY_PATH=/lib:/usr/lib
 
 WORKDIR /app
 
