@@ -21,6 +21,7 @@ class ImageCrawler:
             website = 'https:' + website
         return website
 
+    #Grabs next page url from parent 'a' tag
     def nextMangaURL(self, image, manga, chapter, page):
         parent = image.parent
         if parent.get('href', None) is None:
@@ -30,6 +31,56 @@ class ImageCrawler:
         if manga not in website or chapter not in website or str(page) not in website:
             return None
         return website
+
+    def replaceLastOccurrence(self, string, old, new):
+        size = len(old)
+        end = len(string)
+        start = len(string)-size
+
+        while start >= 0:
+            segment = string[start:end]
+            if segment == old:
+                string = string[:start] + new + string[end:]
+                return string
+            start -= size
+            end -= size
+        # One last check from beginning to end just in case
+        start = 0
+        end = size
+        while end <= len(string):
+            segment = string[start:end]
+            if segment == old:
+                string = string[:start] + new + string[end:]
+                return string
+            start += size
+            end += size
+
+    def manipulateURL(self, url, page):
+        url_split = url.split('/')
+        chapterFound = False
+        for i in range(len(url_split)):
+            segment = url_split[i]
+            if not chapterFound and self.chapter in segment:
+                chapterFound = True
+            elif chapterFound and str(page) in segment:
+                num = ''
+                for c in segment:
+                    if c.isdigit():
+                        num = num + c
+                if page != int(num):
+                    continue
+                url_split[i] = self.replaceLastOccurrence(segment, str(page), str(page+1))
+                url = '/'.join(url_split)
+                return url
+        return None
+
+    def doesURLExist(self, url):
+        response = requests.get(url)
+        if response.status_code == 404:
+            return False
+        else:
+            return True
+
 
     def imageDimensions(self, url):
         if 'png' not in url and 'jpeg' not in url:
@@ -59,11 +110,13 @@ class ImageCrawler:
             if not image:
                 break
             images_list.append(image['src'])
-            website = self.nextMangaURL(image, self.manga, self.chapter, page)
-            if not website:
+            # website = self.nextMangaURL(image, self.manga, self.chapter, page)
+            website = self.manipulateURL(website, page-1)
+            if website is None:
+                website = self.nextMangaURL(image, self.manga, self.chapter, page)
+            if not self.doesURLExist(website):
                 break
         return images_list
-
 
 #Main method to test the Crawler class without having to run the whole app
 if __name__ == "__main__":
