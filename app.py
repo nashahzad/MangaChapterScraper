@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session
 from flask_bootstrap import Bootstrap
 from crawler import ImageCrawler
 
 app = Flask(__name__)
+app.secret_key = '....'
 Bootstrap(app)
 light = True
 
@@ -10,7 +11,16 @@ light = True
 def hello_world():
     args = request.args.to_dict()
     global light
-    light = True if args.get('light', 'true') == 'true' else False
+    page_light = args.get('light', None)
+    if page_light is None:
+        if 'light' in session:
+            light = session['light']
+        else:
+            light = True
+    else:
+        light = True if page_light == 'true' else False
+        session['light'] = light
+
     return render_template('query_page.html', light=light)
 
 @app.route('/search')
