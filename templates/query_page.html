@@ -54,12 +54,26 @@
   </div>
 </form>
             <form action="/">
+                {% if light %}
+                {% block if_buttons %}
               <div class="radio">
               <label><input type="radio" name="light" value="true" checked="checked">Light</label>
             </div>
             <div class="radio">
               <label><input type="radio" name="light" value="false">Dark</label>
             </div>
+                    {% endblock if_buttons %}
+                {% else %}
+                {% block else_buttons %}
+                <div class="radio">
+              <label><input type="radio" name="light" value="true">Light</label>
+            </div>
+            <div class="radio">
+              <label><input type="radio" name="light" value="false" checked="checked">Dark</label>
+            </div>
+                    {% endblock else_buttons %}
+                {% endif %}
+
                 <div class="form-group row">
                 <div class="col-sm-10 text-center">
                   <button type="submit" class="btn btn-primary">Apply</button>
