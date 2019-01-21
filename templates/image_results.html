@@ -24,12 +24,14 @@
 
 {% block body%}
     <div class="container">
-    {% for image in images %}
+    {% for image in images%}
         <div class="row">
-    <img src={{ image }}>
+            <img class="lazy" src="https://i.redd.it/mzz6i3sjrsd11.png" data-src={{ image }} />
         </div>
     {% endfor %}
     </div>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='lazy_load.js') }}"></script>
 {% endblock %}
 
 
