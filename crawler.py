@@ -1,4 +1,4 @@
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, SoupStrainer
 import requests
 import urllib.request
 from PIL import Image
@@ -6,6 +6,8 @@ import sys
 import tldextract
 
 class ImageCrawler:
+    HTTPS = "https://"
+
     def __init__(self, args):
         website = args['website'] if 'http' in args['website'] else 'https://' + args['website']
         self.website = website
@@ -14,22 +16,33 @@ class ImageCrawler:
         self.manga = extract.registered_domain
         self.visited = {}
 
-    def validateURL(self, website):
-        if self.manga not in website:
-            website = 'https://' + self.manga + website
-        elif 'http' not in website:
-            website = 'https:' + website
-        return website
+    def _isNextPage(self, url, next_page):
+        sub1 = str(self.chapter)
+        sub2 = str(next_page)
 
-    def nextMangaURL(self, image, manga, chapter, page):
-        parent = image.parent
-        if parent.get('href', None) is None:
-            return None
-        website = parent['href']
-        website = self.validateURL(website)
-        if manga not in website or chapter not in website or str(page) not in website:
-            return None
-        return website
+        if sub1 in sub2:
+            checklist = [sub2, sub1]
+        else:
+            checklist = [sub1, sub2]
+
+        for check in checklist:
+            if check not in url:
+                return False
+            url = url.replace(check, "", 1)
+        return True
+
+    def validateURL(self, url):
+        if self.manga not in url:
+            url = self.HTTPS + self.manga + url
+        elif 'http' not in url:
+            url = self.HTTPS + url
+        return url
+
+    def nextMangaURL(self, website, next_page):
+        for link in BeautifulSoup(requests.get(website).content, 'html.parser', parse_only=SoupStrainer('a')):
+            if link.has_attr('href') and self._isNextPage(link['href'], next_page):
+                next_url = self.validateURL(link['href'])
+                return next_url
 
     def imageDimensions(self, url):
         if 'png' not in url and 'jpeg' not in url:
@@ -59,7 +72,7 @@ class ImageCrawler:
             if not image:
                 break
             images_list.append(image['src'])
-            website = self.nextMangaURL(image, self.manga, self.chapter, page)
+            website = self.nextMangaURL(website, page)
             if not website:
                 break
         return images_list
@@ -67,9 +80,12 @@ class ImageCrawler:
 
 #Main method to test the Crawler class without having to run the whole app
 if __name__ == "__main__":
-    soup = BeautifulSoup(requests.get('http://www.mangatown.com/manga/shokugeki_no_soma/c294/').content, 'html.parser')
-    images = soup.findAll('img')
-    for image in images:
-        dimensions = requests.head(image['src'])
-        print(dimensions.headers['content-length'])
+   args = {
+       "website": "http://www.mangatown.com/manga/nanatsu_no_taizai/c345/",
+       "chapter": 345,
+   }
+   crawler = ImageCrawler(args)
+   images_list = crawler.crawl()
+   for key in crawler.visited.keys():
+       print(key)
 
