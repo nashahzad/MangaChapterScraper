@@ -1,6 +1,7 @@
-version: '2'
+version: '3'
 services:
-  web:
+  app:
+    image: nashahzad/manga_chapter_scraper:latest
     build: .
     ports:
       - "80:80"
